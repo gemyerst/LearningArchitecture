@@ -241,7 +241,7 @@ namespace LearningArchitecture
             if (action == 4 && state.ContextRays()[3] > 0.5) { r += 5; } //reward doing building back down to the ground
             else if (action == 3 && state.ContextRays()[3] > 0.5) { r -= 5; } // - reward for trying to go up when there's nothing beneath
 
-            if (currHeight > builtHeight) //changing height
+            if (currHeight > builtHeight) // changing height
             {
                 r += 2;
                 if (currHeight >= storey[0]) { r += 2; }
