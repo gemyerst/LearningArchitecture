@@ -207,11 +207,11 @@ namespace LearningArchitecture
             double checkDist = (density / goalDensity) * 5 + 0.5; //long-term reward
             r += checkDist;
 
-            for (int i = 0; i < state.ContextRays().Length; i++)
-            {
-                if (state.ContextRays()[i] <= 1)
-                    r += 20 * goalDensity;
-            }
+            if (state.ContextRays().Sum() <= 10)
+                r += 10 * goalDensity;
+            if (state.ContextRays().Sum() <= 4)
+                r += 20 * goalDensity;
+
             return r;
         }
         public double FootPrintReward(double r, int action)
@@ -234,24 +234,18 @@ namespace LearningArchitecture
         {
             double currHeight = newLoc[2];
             double builtHeight = min[2];
-            double[] storey = new double[3] { goalHeight / 3, (goalHeight / 3)*2, goalHeight / 3};
 
-            if(action == 3 && goalHeight >= observationSpace.Mid(2)) { r += 2; } //UP
-            else if (action == 4 && goalHeight < observationSpace.Mid(2)) { r += 2; } //DOWN
-            if (action == 4 && state.ContextRays()[3] > 0.5) { r += 5; } //reward doing building back down to the ground
-            else if (action == 3 && state.ContextRays()[3] > 0.5) { r -= 5; } // - reward for trying to go up when there's nothing beneath
+            if (currHeight == min[2]) { r += 10; } // reward for creating a good foundation
 
-            if (currHeight > builtHeight) // changing height
-            {
-                r += 2;
-                if (currHeight >= storey[0]) { r += 2; }
-                else if (currHeight >= storey[1]) { r += 2; }
-                else if (currHeight >= storey[2]) { r += 2; }
-            }
+            if (action == 4) { r += 5; }
+            else if (action == 3) { r -=5; }
 
-            if (currHeight >= goalHeight - 2 * blockSize && currHeight <= currHeight + 2 * blockSize) { r += 5; }
-            else if (currHeight <= goalHeight * blockSize) { r += 1; }
-            else if (currHeight > goalHeight + 2) { reward -= 3; }
+            if (action == 4 && state.ContextRays()[3] > 1) { r += 5; } //reward doing building back down to the ground
+            else if (action == 3 && state.ContextRays()[3] > 1) { r -= 5; } // - reward for trying to go up when there's nothing beneath
+
+            if (currHeight >= goalHeight - 2 && currHeight <= goalHeight) { r += 2; }
+            else if (currHeight <= goalHeight) { r += 6; }
+            else if (currHeight > goalHeight) { reward -= 15; }
             return r;
         }
 
